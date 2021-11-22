@@ -128,4 +128,4 @@ class Client:
             return total
 
         except TooManyProductsFoundError:
-            return -1
+            return None
