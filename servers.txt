@@ -1,0 +1,50 @@
+@startuml
+class Product{
++ name: str
++ price : price
++ __init__(self,name: str,price: float)
++ __eq__(self,other)
++ __hash__(self)
+
+}
+
+Product "*" --* "1" ListServer
+Product "*" --* "1" MapServer
+
+' ListServer "1" *-- "*" Product
+' MapServer "1" *-- "*" Product
+
+class ListServer{
++ products : List[Procuct]
++__init__(self,products)
+-_get_all_products(self,n_letters:int=1)-> List[Product]:
+
+}
+ListServer --|> Server
+
+class MapServer{
++products:Dict[str,Product]
++__init__(self,products)
+-_get_all_products(self,n_letters:int=1)-> List[Product]:
+}
+MapServer --|> Server
+
+class Client{
++__init__(self,server:Union[MapServer,ListServer])
++get_total_price(self,n_letters: Optional[int])-> Optional[float]:
+}
+
+Server -o Client
+
+abstract class Server{
+    +  n_max_returned_entries
+    + __init__(self, *args, **kwargs)
+    + get_entries(self, n_letters: int): List[Product]
+    - {abstract} _get_all_products(self, n_letters: int = 1): List[Product]
+
+}
+class TooManyProductsFoundError {
+}
+TooManyProductsFoundError --|> ServerError 
+Server ..> TooManyProductsFoundError : "<< throws >>"
+@enduml
