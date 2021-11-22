@@ -55,7 +55,7 @@ class Product:
         return hash((self.name, self.price))
 
 
-class TooManyProductsError(Exception):
+class TooManyProductsFoundError(Exception):
     pass
 
 
@@ -70,7 +70,7 @@ class Server(ABC):  # klasa abstrakcyjna
             if re.match(criteria, product.name):
                 matching_products.append(product)
         if len(matching_products) > Server.n_max_returned_entries:
-            raise TooManyProductsError
+            raise TooManyProductsFoundError
 
         matching_products.sort(key=lambda x: x.price)
         return matching_products
@@ -127,5 +127,5 @@ class Client:
                 total += product.price
             return total
 
-        except TooManyProductsError:
+        except TooManyProductsFoundError:
             return -1

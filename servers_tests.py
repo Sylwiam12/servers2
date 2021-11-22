@@ -1,6 +1,6 @@
 import unittest
 
-from servers import Server, ListServer, Product, Client, TooManyProductsError
+from servers import Server, ListServer, Product, Client, TooManyProductsFoundError
 
 
 class ServerTest(unittest.TestCase):
@@ -15,7 +15,7 @@ class ServerTest(unittest.TestCase):
         products = [Product('PP234', 2)] * (ListServer.n_max_returned_entries +1)
         server = ListServer(products)
 
-        with self.assertRaises(TooManyProductsError):
+        with self.assertRaises(TooManyProductsFoundError):
             server.get_entries(2)
 
     def test_get_entries_returns_proper_entries(self):
@@ -29,7 +29,7 @@ class TestClient(unittest.TestCase):
         products = [Product('PP234', 2)] * (ListServer.n_max_returned_entries +1)
         server = ListServer(products)
         client = Client(server)
-        with self.assertRaises(TooManyProductsError):
+        with self.assertRaises(TooManyProductsFoundError):
             server.get_entries(2)
 
     def test_total_price_for_normal_execution(self):
