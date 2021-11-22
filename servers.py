@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+#Sylwia Michalska , 407870 Julia Midera , 407628 Paweł Mitręga ,406867
 from abc import ABC, abstractmethod
 from typing import Optional, List, Union
 import re

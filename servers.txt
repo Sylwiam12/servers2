@@ -1,4 +1,5 @@
 @startuml
+'Sylwia Michalska , 407870 Julia Midera , 407628 Paweł Mitręga ,406867
 class Product{
 + name: str
 + price : price
