@@ -41,15 +41,12 @@ class Product:
     # FIXME: klasa powinna posiadać metodę inicjalizacyjną przyjmującą argumenty wyrażające nazwę produktu (typu str) i jego cenę (typu float) -- w takiej kolejności -- i ustawiającą atrybuty `name` (typu str) oraz `price` (typu float)
 
     def __init__(self, name: str, price: float):
-        is_name_valid(name)
         self.name = name
+        is_name_valid(name)
         self.price = price
 
     def __eq__(self, other):
-        if self.name == other.id and self.price == other.price:
-            return True
-        else:
-            return False  # FIXME: zwróć odpowiednią wartość
+        return (self.name == other.name) and (self.price == other.price)  # FIXME: zwróć odpowiednią wartość
 
     def __hash__(self):
         return hash((self.name, self.price))
@@ -63,15 +60,16 @@ class Server(ABC):  # klasa abstrakcyjna
 
     n_max_returned_entries: int = 4
 
-    def get_entries(self, n_letters: int = 1) -> List[Product]:
+    def get_entries(self, n_letters: int = 1):
         matching_products = []
         criteria = "[a-zA-Z]" + "{" + str(n_letters) + "}[1-9]{2,3}"
         for product in self._get_all_products(n_letters):
             if re.match(criteria, product.name):
                 matching_products.append(product)
+            if len(matching_products) > Server.n_max_returned_entries:
+                raise TooManyProductsFoundError
         if len(matching_products) > Server.n_max_returned_entries:
             raise TooManyProductsFoundError
-
         matching_products.sort(key=lambda x: x.price)
         return matching_products
 
@@ -117,15 +115,14 @@ class Client:
 
     def get_total_price(self, n_letters: Optional[int]) -> Optional[float]:
         try:
-            if n_letters is None:
-                products_to_sum = self.server.get_entries()
-            else:
-                products_to_sum = self.server.get_entries(n_letters)
-
-            total = 0
-            for product in products_to_sum:
-                total += product.price
-            return total
-
-        except TooManyProductsFoundError:
+            products = self.client_server.get_entries(n_letters)
+        except:
             return None
+        else:
+            total = 0
+            if products:
+                for product in products:
+                    total = total + product.price
+                return total
+            else:
+                return None
