@@ -36,9 +36,11 @@ def is_name_valid(name):
     if l_count == 0 or n_count == 0:
         raise ValueError('name must consist of at least 1 number and 1 letter')
 
+
 def is_price_valid(price):
-    if price <0:
+    if price < 0:
         raise ValueError('cena jest mniejsza od zera')
+
 
 class Product:
     # FIXME: klasa powinna posiadać metodę inicjalizacyjną przyjmującą argumenty wyrażające nazwę produktu (typu str) i jego cenę (typu float) -- w takiej kolejności -- i ustawiającą atrybuty `name` (typu str) oraz `price` (typu float)
@@ -62,18 +64,24 @@ class TooManyProductsFoundError(Exception):
 
 class Server(ABC):  # klasa abstrakcyjna
 
-    n_max_returned_entries: int = 4
+    def __init__(self):
+        super().__init__()
 
-    def get_entries(self, n_letters: int = 1):
-        matching_products = []
-        criteria = "[a-zA-Z]" + "{" + str(n_letters) + "}[1-9]{2,3}"
-        for product in self._get_all_products(n_letters):
-            if re.match(criteria, product.name):
-                matching_products.append(product)
-            if len(matching_products) > Server.n_max_returned_entries:
-                raise TooManyProductsFoundError
-        matching_products.sort(key=lambda x: x.price)
-        return matching_products
+    n_max_returned_entries = 4
+    products = None
+
+    def get_entries(self, n_letters: int = 1) -> List[Product]:
+        scheme = '^[a-zA-Z]{{{n_letters}}}\\d{{2,3}}$'.format(n_letters=n_letters)
+        list = []
+        for i in self._get_all_products(n_letters):
+            if re.match(scheme, i.name):
+                list.append(i)
+            if len(list) > Server.n_max_returned_entries:
+                raise TooManyProductsFoundError(len(list), self.n_max_returned_entries)
+        if len(list) > Server.n_max_returned_entries:
+            raise TooManyProductsFoundError(len(list), self.n_max_returned_entries)
+        list.sort(key=lambda entry: entry.price)
+        return list
 
     @abstractmethod
     def _get_all_products(self, n_letters: int = 1) -> List[Product]:
@@ -89,6 +97,7 @@ class ListServer(Server):
     products = []
 
     def __init__(self, products):
+        super().__init__()
         self.products = products
 
     def _get_all_products(self, n_letters: int = 1) -> List[Product]:
@@ -99,6 +108,7 @@ class MapServer(Server):
     products = {}
 
     def __init__(self, products):
+        super().__init__()
         for product in products:
             self.products[product.name] = product
 
