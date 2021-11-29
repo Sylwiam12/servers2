@@ -71,10 +71,10 @@ class Server(ABC):  # klasa abstrakcyjna
     products = None
 
     def get_entries(self, n_letters: int = 1) -> List[Product]:
-        scheme = '^[a-zA-Z]{{{n_letters}}}\\d{{2,3}}$'.format(n_letters=n_letters)
+        criteria = "[a-zA-Z]" + "{" + str(n_letters) + "}[1-9]{2,3}"
         list = []
         for i in self._get_all_products(n_letters):
-            if re.match(scheme, i.name):
+            if re.match(criteria, i.name):
                 list.append(i)
             if len(list) > Server.n_max_returned_entries:
                 raise TooManyProductsFoundError(len(list), self.n_max_returned_entries)
