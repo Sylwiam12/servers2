@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#Sylwia Michalska , 407870 Julia Midera , 407628 Paweł Mitręga ,406867
+# Sylwia Michalska , 407870 Julia Midera , 407628 Paweł Mitręga ,406867
 from abc import ABC, abstractmethod
 from typing import Optional, List, Union
 import re
@@ -36,12 +36,16 @@ def is_name_valid(name):
     if l_count == 0 or n_count == 0:
         raise ValueError('name must consist of at least 1 number and 1 letter')
 
+def is_price_valid(price):
+    if price <0:
+        raise ValueError('cena jest mniejsza od zera')
 
 class Product:
     # FIXME: klasa powinna posiadać metodę inicjalizacyjną przyjmującą argumenty wyrażające nazwę produktu (typu str) i jego cenę (typu float) -- w takiej kolejności -- i ustawiającą atrybuty `name` (typu str) oraz `price` (typu float)
 
     def __init__(self, name: str, price: float):
         is_name_valid(name)
+        is_price_valid(price)
         self.name = name
         self.price = price
 
@@ -68,8 +72,6 @@ class Server(ABC):  # klasa abstrakcyjna
                 matching_products.append(product)
             if len(matching_products) > Server.n_max_returned_entries:
                 raise TooManyProductsFoundError
-        if len(matching_products) > Server.n_max_returned_entries:
-            raise TooManyProductsFoundError
         matching_products.sort(key=lambda x: x.price)
         return matching_products
 
@@ -108,21 +110,19 @@ class MapServer(Server):
 
 
 class Client:
-    # FIXME: klasa powinna posiadać metodę inicjalizacyjną przyjmującą obiekt reprezentujący serwer
+    def __init__(self, server):
+        self.client_server = server
 
-    def __init__(self, server: Union[MapServer, ListServer]):
-        self.server = server
-
-    def get_total_price(self, n_letters: Optional[int]) -> Optional[float]:
+    def get_total_price(self, n_letters: int):
         try:
             products = self.client_server.get_entries(n_letters)
         except:
             return None
         else:
-            total = 0
+            sum_price = 0
             if products:
                 for product in products:
-                    total = total + product.price
-                return total
+                    sum_price = sum_price + product.price
+                return sum_price
             else:
                 return None

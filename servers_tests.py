@@ -32,11 +32,7 @@ class TestClient(unittest.TestCase):
         with self.assertRaises(TooManyProductsFoundError):
             server.get_entries(2)
 
-    def test_total_price_for_normal_execution(self):
-        products = [Product('P234', 2), Product('P235', 3)]
-        server = ListServer(products)
-        client = Client(server)
-        self.assertEqual(5, client.get_total_price(1))
+
 
 
 if __name__ == '__main__':
